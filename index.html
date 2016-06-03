@@ -1,0 +1,147 @@
+<html>
+<head>
+	<title>Entitlements Calculator</title>
+	<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+<link type="text/css" rel="stylesheet" href="https://www.uschamber.com/sites/all/themes/uscoc/css/global.css" media="all" />
+
+  	<style>
+		body { font-family: Arial, Helvetica, sans-serif; margin:20px; }
+
+		h1,h2,h3,h4,h5,h6 { margin: 0px; }
+		p { margin-top: 0px; margin-bottom: 10px; }
+		a, a:link, a:visited, a:active { font-family: Arial, Helvetica, sans-serif; font-weight: bold; text-decoration: none; }
+		input#submit {font-family: sans-serif; font-weight: bold;}
+		div#validation-messages {font-weight: bold; color: red;}
+
+	</style>
+  <script src="https://www.uschamber.com/sites/all/themes/uscoc/js/jquery-upgrade/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      /**Function to add commas and truncate decimals for outputs
+      */
+      function numberWithCommas(x) {
+        var parts = (+x).toFixed(2).split(".");
+        var num = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (+parts[1] ? "." + parts[1] : "");
+        return num;
+      }
+      /**
+       * Validate that there are no non-numeric characters in the passed in variable (only numerals and decimal points allowed)
+       */
+      function validate(annualIncome) {
+        // Reset any potentially stil existing validation messages
+        $('#validation-messages').html('');
+        $('#monthlyIncome').html('');
+
+        // Validate that there are only numbers or decimal points in the data
+        var foundInvalidCharacters = annualIncome.match(/[^0-9.]+/ig);
+        if(foundInvalidCharacters) {
+          $('#validation-messages').html('Invalid entry. Please enter a valid number.')
+          return false;
+        }
+
+        // If we didn't find invalid characters, we're good!
+        return true;
+      }
+      
+      /**
+       * Compute the given annual income
+       */
+      function compute(annualIncome) {
+        // Our validate function will prevent computer() from being called if it's blank, so this code isn't really needed
+        if (annualIncome.length == 0) {
+          annualIncome = "0";
+        }
+
+        // Ensure that annualIncome is an integer (note that this REMOVES any decimal places... do you really want this?)
+        // Probably no longer needed...
+        //annualIncome = parseInt(annualIncome, 10);
+
+        // Calculate various values based on income
+        var monthlyIncome = (annualIncome) / 12;
+        var normHousing = annualIncome * 0.026666667;
+        var govtHousing = annualIncome * 0.076666667;
+        var normTrans = annualIncome * 0.015833333;
+        var govtTrans = annualIncome * 0.001862745;
+        var normFood = annualIncome * 0.010833333;
+        var govtFood = annualIncome * 0.00127451;
+        var normInsure = annualIncome * 0.009166667;
+        var govtInsure = annualIncome * 0.001078431;
+        var normHealth = annualIncome * 0.005;
+        var govtHealth = annualIncome * 0.000588235;
+        var normEntertain = annualIncome * 0.004166667;
+        var govtEntertain = annualIncome * 0.000490196;
+        var normApparel = annualIncome * 0.003333333;
+        var govtApparel = annualIncome * 0.000392157;
+        var normOther = annualIncome * 0.008333333;
+        var govtOther = annualIncome * 0.000980392;
+
+        // Show our calculated values to user by calling the numbersWithCommas function to format the number and change the HTML
+        $('#monthlyIncome').html("$" + numberWithCommas(monthlyIncome));
+        $('#normHousing').html("$" + numberWithCommas(normHousing));
+        $('#govtHousing').html("$" + numberWithCommas(govtHousing));
+        $('#normTrans').html("$" + numberWithCommas(normTrans));
+        $('#govtTrans').html("$" + numberWithCommas(govtTrans));
+        $('#normFood').html("$" + numberWithCommas(normFood));
+        $('#govtFood').html("$" + numberWithCommas(govtFood));
+        $('#normInsure').html("$" + numberWithCommas(normInsure));
+        $('#govtInsure').html("$" + numberWithCommas(govtInsure));
+        $('#normHealth').html("$" + numberWithCommas(normHealth));
+        $('#govtHealth').html("$" + numberWithCommas(govtHealth));
+        $('#normEntertain').html("$" + numberWithCommas(normEntertain));
+        $('#govtEntertain').html("$" + numberWithCommas(govtEntertain));
+        $('#normApparel').html("$" + numberWithCommas(normApparel));
+        $('#govtApparel').html("$" + numberWithCommas(govtApparel));
+        $('#normOther').html("$" + numberWithCommas(normOther));
+        $('#govtOther').html("$" + numberWithCommas(govtOther));
+      } // end function compute
+
+      // Act on the submit event of the entitlements html form
+      $('#entitlements').submit(function () {
+        // Get the user supplied input from the textfield
+        var annualIncome = $('#annualIncome').val();
+
+        // Strip commas and dollar signs before validation/computation
+        annualIncome = annualIncome.replace(',', '');
+        annualIncome = annualIncome.replace('$', '');
+
+        // Validate, and if successful, compute.
+        if(validate(annualIncome)) {
+          compute(annualIncome);
+        }
+
+        return false;
+      }); // end compute submit listener
+
+    }); // end document.ready
+
+  </script>
+
+
+</head>
+<body>
+	<noscript><h1 style="color:red;">Javascript must be enabled to use this calculator.</h1></noscript>
+	<form id="entitlements">
+		<h2>Your Annual Income: $ <input id="annualIncome" /></h2><div id="validation-messages"></div>
+
+	<p><input id="submit" type="submit" value="Submit" /></p>
+	<br>
+	<p><strong>Your Calculated Monthly Income: <span id="monthlyIncome"></span></strong></p>
+
+	<table border="1" cellpadding="1" cellspacing="1" class="zebra-striped" style="width:100%">
+		<tbody>
+			<tr class="odd"><td><strong>Current monthly budget breakdown based on average U.S. consumer spending habits</strong></td><td><strong>New monthly budget breakdown based on U.S. Government's spending habits</strong></td></tr>
+			<tr class="even"><td>Housing: <span id="normHousing"></span></td><td>Housing (entitlements): <span id="govtHousing"></span></td></tr>
+			<tr class="odd"><td>Transportation: <span id="normTrans"></span></td><td>Transportation: <span id="govtTrans"></span></td></tr>
+			<tr class="even"><td>Food: <span id="normFood"></span></td><td>Food: <span id="govtFood"></span></td></tr>
+			<tr class="odd"><td>Insurance: <span id="normInsure"></span></td><td>Insurance: <span id="govtInsure"></span></td></tr>
+			<tr class="even"><td>Health Care: <span id="normHealth"></span></td><td>Health Care: <span id="govtHealth"></span></td></tr>
+			<tr class="odd"><td>Entertainment: <span id="normEntertain"></span></td><td>Entertainment: <span id="govtEntertain"></span></td></tr>
+			<tr class="even"><td>Apparel: <span id="normApparel"></span></td><td>Apparel: <span id="govtApparel"></span></td></tr>
+			<tr class="odd"><td>Other: <span id="normOther"></span></td><td>Other: <span id="govtOther"></span></td></tr>
+		</tbody>
+	</table>
+	</form>
+</body>
+
+</html>
